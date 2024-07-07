@@ -1,35 +1,50 @@
-import sys
-input = sys.stdin.read
-data = input().split()
+def main():
+    import sys
+    input = sys.stdin.read
+    from bisect import insort, bisect_left
+    from itertools import islice
 
-n = int(data[0])
-arr = [0] * (n + 1)
-g = [0] * (n + 1)
+    data = input().split()
+    
+    N = int(data[0])
+    a = [0] * (N + 1)
+    pos = [0] * (N + 1)
+    
+    for i in range(1, N + 1):
+        a[i] = int(data[i])
+    for i in range(1, N + 1):
+        pos[a[i]] = i
+    
+    s = []
+    ans = 0
 
-for i in range(1, n + 1):
-    arr[i] = int(data[i])
+    def update(p_index):
+        if p_index >= len(s) - 2:
+            return 0
+        if (s[p_index][1] < s[p_index + 1][1]) != (s[p_index + 1][1] < s[p_index + 2][1]):
+            return 0
+        return s[p_index][0] * (N - s[p_index + 2][0] + 1)
+    
+    for i in range(1, N + 1):
+        p = bisect_left(s, (pos[i], 0))
 
-for x in range(1, n + 1):
-    for y in range(1, n + 1):
-        v = []
-        dir = 0
-        
-        for z in range(y, n + 1):
-            cur = arr[z]
-            if cur <= x:
-                if len(v) < 2:
-                    v.append(cur)
-                    if len(v) == 2:
-                        dir = 1 if v[0] > v[1] else -1
-                else:
-                    nxt_dir = 1 if v[-1] > cur else -1
-                    if dir != nxt_dir:
-                        v.append(cur)
-                        dir = nxt_dir
-                    else:
-                        v[-1] = cur
-            
-            g[x] += len(v)
+        if p > 0:
+            ans += update(p - 1)
+            if p > 1:
+                ans += update(p - 2)
 
-for i in range(1, n + 1):
-    print(g[i])
+        insort(s, (pos[i], i))
+        ans += pos[i] * (N - pos[i] + 1)
+
+        p = bisect_left(s, (pos[i], 0))
+
+        ans -= update(p)
+        if p > 0:
+            ans -= update(p - 1)
+            if p > 1:
+                ans -= update(p - 2)
+
+        print(ans)
+
+if __name__ == "__main__":
+    main()
