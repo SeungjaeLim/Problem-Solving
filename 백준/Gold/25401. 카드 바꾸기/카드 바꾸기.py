@@ -2,6 +2,14 @@ N = int(input())
 
 arr = [0] + list(map(int, input().split()))
 
+def check(s, diff):
+    cnt = 0
+    for i in range(1, N + 1):
+        s += diff
+        if arr[i] != s:
+            cnt += 1
+    return cnt
+
 ans = 500
 for i in range(1, N):
     for j in range(i + 1, N + 1):
@@ -9,13 +17,6 @@ for i in range(1, N):
 
         if diff - int(diff) != 0:
             continue
-        
-        cnt = 0
-        s = arr[i] - diff * i
-        for k in range(1, N + 1):
-            s += diff
-            if arr[k] != s:
-                cnt += 1
 
-        ans = min(ans, cnt)
+        ans = min(ans, check(arr[i] - diff * i, diff))
 print(ans)
